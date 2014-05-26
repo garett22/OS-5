@@ -14,10 +14,18 @@ public class SJF{
 	SJF(){
 	}
 
-	void dodaj(int t,int p,long s){
-		cpu.add(new Proces(t,p,s));
+	void dodaj(Proces p){
+		p.s=zegar;
+		cpu.add(p);
 	}
 
+	int usage(){
+		int s=0;
+		for(Proces p:cpu)
+			s+=p.p*p.t;
+		return s/cpu.size();
+	}
+	
 	void wykonaj(){ // wykonanie jednego taktu
 		zegar++;
 		if(!cpu.isEmpty()){

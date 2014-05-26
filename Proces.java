@@ -4,7 +4,7 @@
 public class Proces implements Comparable<Proces>{
 	long s; // start - czas dodania
 	int t; // time - czas pozostały do ukończenia
-	int p; // power - 1~~100% użycia procesora
+	int p; // power - 1~100% użycia procesora
 	long r; // rozpoczęcie - kiedy należy rozpocząć proces
 
 	Proces(int l,int pow,long z){ // dł,moc,zegar

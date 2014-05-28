@@ -4,32 +4,46 @@ public class Network3{
 	ArrayList<SJF> network=new ArrayList<>();
 	int pr; // próg obciążenia
 	int r; // próg poniżej którego dokładamy zadań
+	int z; // pętla sprawdzająca biega niemal w nieskończoność
+	ArrayList<Integer> obc=new ArrayList<>();
+	int migracje=0;
 
-	Network3(int pr,int r,int n){
+	Network3(int pr,int r,int n,int z){
 		this.pr=pr;
 		this.r=r;
+		this.z=z;
 		for(int i=0;i<n;i++)
 			network.add(new SJF());
 	}
 
 	void dodaj(int k,Proces p){
-		if(network.get(k).usage()<pr){
+		if(network.get(k).usage<pr){
 			network.get(k).dodaj(p);
 			return;
 		}
 		boolean[] bb=new boolean[network.size()]; // domyślnie false
 		bb[k]=true;
 		boolean b=true;
-		while(b){
-			int n=(int)(Math.random()*(network.size()-1));
-			if(!bb[n]){ // jeśli nie był odwiedzony
-				if(network.get(n).usage()<pr){ // i jeśli użycie niższe niż pr
-					network.get(n).dodaj(p); // dodaj
-					b=false; // wyjdź z pętli
-					p=null; // i nie dodawaj po pętli
+		int n=0;
+		int i=0;
+		while(b&&i++<z){
+			while((n=(int)(Math.random()*(network.size()-1)))==k)
+				;
+			if(!bb[n]){
+				network.get(n).u++;
+				if(network.get(n).usage<pr){
+					network.get(n).dodaj(p);
+					migracje++;
+					b=false;
+					p=null; // nie dodawaj po pętli
 				} else
 					bb[n]=true;
 			}
+			// czy zostało coś do spytania?
+			b=false;
+			for(int j=0;j<network.size();j++)
+				if(!bb[j])
+					b=true;
 		}
 		if(p!=null) // jeśli przeszukał i nie dodał
 			network.get(k).dodaj(p);
@@ -40,13 +54,26 @@ public class Network3{
 			p.wykonaj();
 	}
 
+	void obc(){
+		if(obc.size()<1000){
+			int o=0;
+			for(SJF s:network)
+				o+=s.usage;
+			obc.add(o/network.size());
+		}
+	}
+
 	void migruj(){
-		for(SJF p:network)
-			if(p.usage()<r)
-				while(true){
-					// TODO znajdź procesory obciążone powyżej pr
-					// pobierz z nich jeden z procesów, ?najcięższy?
-					// i dodaj na siebie
+		for(SJF p:network){
+			int k=0;
+			while(p.usage<r&&k++<z){
+				int n=(int)(Math.random()*(network.size()-1));
+				if(network.get(n).usage>pr){
+					network.get(n).u++;
+					p.cpu.add(network.get(n).getHeaviest());
+					migracje++;
 				}
+			}
+		}
 	}
 }

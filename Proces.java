@@ -1,30 +1,22 @@
-﻿// przekopiowane z zad1
-// pola zmienione na public
-
-public class Proces implements Comparable<Proces>{
-	long s; // start - czas dodania
+﻿public class Proces implements Comparable<Proces>{
 	int t; // time - czas pozostały do ukończenia
 	int p; // power - 1~100% użycia procesora
-	long r; // rozpoczęcie - kiedy należy rozpocząć proces
 
-	Proces(int l,int pow,long z){ // dł,moc,zegar
-		s=z;
-		t=l;
+	Proces(int len,int pow){ // dł,moc
+		t=len;
 		p=pow;
-	}
-
-	Proces(int l,long z,long rozp){
-		t=l;
-		s=rozp;
-		r=rozp;
 	}
 
 	@Override
 	public String toString(){
-		return "Proces [s="+s+", t="+t+"]";
+		return "Proces [t="+t+", p="+p+"]";
 	}
 
 	public int compareTo(Proces p){
-		return ((Integer)t).compareTo(p.t);
+		return p!=null?((Integer)t).compareTo(p.t):1;
+	}
+
+	public boolean equals(Object o){
+		return o instanceof Proces ? p==((Proces)o).p&&t==((Proces)o).t : false;
 	}
 }

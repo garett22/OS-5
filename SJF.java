@@ -1,41 +1,54 @@
-﻿// przekopiowane z zad1
-// cpu zmienione z arrlisty na treeset - autosortowanie
-// get/set zmienione na dostęp bezpośredni
-
-import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.TreeSet;
+﻿import java.util.ArrayList;
+import java.util.Collections;
 
 public class SJF{
-	SortedSet<Proces> cpu=new TreeSet<Proces>(); // Sjf
-	ArrayList<Integer> o=new ArrayList<Integer>(); // czasy Oczekiwań
-	long zegar=0;
+	ArrayList<Proces> cpu=new ArrayList<Proces>();
+	int u=0;
+	int usage=0;
 
 	SJF(){
+		cpu.clear();
 	}
 
 	void dodaj(Proces p){
-		p.s=zegar;
 		cpu.add(p);
 	}
 
-	int usage(){
-		int s=0;
+	Proces getHeaviest(){
+		Proces pp=null;
+		int obc=0;
 		for(Proces p:cpu)
-			s+=p.p*p.t;
-		return s/cpu.size();
+			if(p.t*p.p>obc){
+				pp=p;
+				obc=p.t*p.p;
+			}
+		cpu.remove(pp);
+		return pp;
 	}
-	
-	void wykonaj(){ // wykonanie jednego taktu
-		zegar++;
+
+	void wykonaj(){
 		if(!cpu.isEmpty()){
-			Proces p=cpu.first();
-			cpu.remove(0);
-			if(p.t>1){
-				p.t--;
-				cpu.add(p);
-			} else
-				o.add((int)(zegar-p.s)); // long-long=>int
+			usage=0;
+			for(int i=0;i<(cpu.size()>=4 ? 4 : cpu.size());i++){
+				Proces p=cpu.get(0);
+				cpu.remove(0);
+				if(p!=null){
+					usage+=p.p;
+					if(p.t>1){
+						p.t--;
+						cpu.add(p);
+					}
+				}
+			}
+			usage/=4;
+			// zabezpieczenie przed błędami (fikcyjne nulle)
+			for(int i=0,j=0;i<cpu.size();i++)
+				if(cpu.get(j)==null)
+					cpu.remove(j);
+				else
+					j++;
+
+			Collections.sort(cpu);
 		}
 	}
 }
